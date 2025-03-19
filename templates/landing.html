@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Brazcubas - Reconhecimento de Texto Inteligente</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/logo.svg') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- VLibras -->
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+</head>
+<body>
+    <!-- VLibras Widget -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-text-paragraph"></i> OCR Brazcubas
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Recursos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">Como Funciona</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ocr">Começar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="skeleton-container" id="heroSkeleton">
+                        <div class="skeleton skeleton-text" style="width: 60%; height: 2.5em; margin-bottom: 1em;"></div>
+                        <div class="skeleton skeleton-text" style="width: 80%; height: 1.5em; margin-bottom: 2em;"></div>
+                        <div class="skeleton skeleton-button" style="width: 200px; height: 50px;"></div>
+                    </div>
+                    <div class="hero-content">
+                        <h1 class="display-4 fw-bold mb-4">Transforme Imagens em Texto com Precisão</h1>
+                        <p class="lead mb-4">Descubra o poder da tecnologia OCR mais avançada! Extraia texto de qualquer imagem com precisão e velocidade, usando nossa solução inteligente de reconhecimento de caracteres.</p>
+                        <a href="/ocr" class="cta-button btn btn-primary btn-lg">Começar Agora <i class="bi bi-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="video-container rounded shadow">
+                        <video autoplay loop muted playsinline class="img-fluid rounded">
+                            <source src="{{ url_for('static', filename='videos/demo.mp4') }}" type="video/mp4">
+                            Seu navegador não suporta o elemento de vídeo.
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Técnica OCR -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold">Tecnologia OCR</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="tech-content">
+                        <h3 class="mb-4">Como Funciona?</h3>
+                        <div class="tech-item">
+                            <i class="bi bi-cpu"></i>
+                            <div>
+                                <h4>Processamento de Imagem</h4>
+                                <p>Utilizamos algoritmos avançados de processamento de imagem para otimizar a qualidade e legibilidade do texto antes da extração.</p>
+                            </div>
+                        </div>
+                        <div class="tech-item">
+                            <i class="bi bi-robot"></i>
+                            <div>
+                                <h4>Inteligência Artificial</h4>
+                                <p>Nossa solução emprega modelos de IA treinados especificamente para reconhecimento de caracteres em documentos brasileiros.</p>
+                            </div>
+                        </div>
+                        <div class="tech-item">
+                            <i class="bi bi-gear"></i>
+                            <div>
+                                <h4>Otimização</h4>
+                                <p>Processamento otimizado para garantir resultados precisos mesmo em documentos com baixa qualidade ou resolução.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="tech-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">99%</span>
+                            <span class="stat-label">Precisão</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">0.5s</span>
+                            <span class="stat-label">Processamento</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">100+</span>
+                            <span class="stat-label">Formatos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold">Recursos Principais</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="skeleton-container" id="feature1Skeleton">
+                        <div class="skeleton skeleton-text" style="width: 70%; height: 1.5em; margin-bottom: 1em;"></div>
+                        <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                    </div>
+                    <div class="card feature-card h-100 p-4">
+                        <div class="card-body text-center">
+                            <i class="bi bi-lightning-charge feature-icon"></i>
+                            <h3 class="h5">Rápido e Eficiente</h3>
+                            <p>Processamento instantâneo de imagens com resultados precisos em segundos.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="skeleton-container" id="feature2Skeleton">
+                        <div class="skeleton skeleton-text" style="width: 70%; height: 1.5em; margin-bottom: 1em;"></div>
+                        <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                    </div>
+                    <div class="card feature-card h-100 p-4">
+                        <div class="card-body text-center">
+                            <i class="bi bi-check-circle feature-icon"></i>
+                            <h3 class="h5">Alta Precisão</h3>
+                            <p>Reconhecimento preciso de texto, mesmo em imagens de baixa qualidade.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="skeleton-container" id="feature3Skeleton">
+                        <div class="skeleton skeleton-text" style="width: 70%; height: 1.5em; margin-bottom: 1em;"></div>
+                        <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                    </div>
+                    <div class="card feature-card h-100 p-4">
+                        <div class="card-body text-center">
+                            <i class="bi bi-gear feature-icon"></i>
+                            <h3 class="h5">Fácil de Usar</h3>
+                            <p>Interface intuitiva e amigável para todos os usuários.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold">Como Funciona</h2>
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    <div class="skeleton-container" id="step1Skeleton">
+                        <div class="skeleton skeleton-text" style="width: 70%; height: 1.5em; margin-bottom: 1em;"></div>
+                        <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                    </div>
+                    <div class="mb-4">
+                        <i class="bi bi-upload display-4 text-primary"></i>
+                    </div>
+                    <h4>1. Upload</h4>
+                    <p>Faça upload da sua imagem</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="skeleton-container" id="step2Skeleton">
+                        <div class="skeleton skeleton-text" style="width: 70%; height: 1.5em; margin-bottom: 1em;"></div>
+                        <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                    </div>
+                    <div class="mb-4">
+                        <i class="bi bi-gear-fill display-4 text-primary"></i>
+                    </div>
+                    <h4>2. Processamento</h4>
+                    <p>Nossa IA processa a imagem</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="skeleton-container" id="step3Skeleton">
+                        <div class="skeleton skeleton-text" style="width: 70%; height: 1.5em; margin-bottom: 1em;"></div>
+                        <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                    </div>
+                    <div class="mb-4">
+                        <i class="bi bi-text-paragraph display-4 text-primary"></i>
+                    </div>
+                    <h4>3. Extração</h4>
+                    <p>Texto é extraído e organizado</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="skeleton-container" id="step4Skeleton">
+                        <div class="skeleton skeleton-text" style="width: 70%; height: 1.5em; margin-bottom: 1em;"></div>
+                        <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                    </div>
+                    <div class="mb-4">
+                        <i class="bi bi-download display-4 text-primary"></i>
+                    </div>
+                    <h4>4. Resultado</h4>
+                    <p>Obtenha seu texto estruturado</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Casos de Uso Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold">Casos de Uso</h2>
+            <div class="row g-4 justify-content-center">
+                <!-- Empresas -->
+                <div class="col-md-4">
+                    <div class="use-case-card">
+                        <div class="use-case-icon">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <h3>Empresas</h3>
+                        <ul class="use-case-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Digitalização de contratos</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Processamento de faturas</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Gestão de recibos</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Educação -->
+                <div class="col-md-4">
+                    <div class="use-case-card">
+                        <div class="use-case-icon">
+                            <i class="bi bi-mortarboard"></i>
+                        </div>
+                        <h3>Educação</h3>
+                        <ul class="use-case-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Digitalização de livros</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Conversão de apostilas</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Material didático</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Pessoas Físicas -->
+                <div class="col-md-4">
+                    <div class="use-case-card">
+                        <div class="use-case-icon">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <h3>Pessoas Físicas</h3>
+                        <ul class="use-case-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Organização de documentos</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Gestão de recibos</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Digitalização pessoal</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <!-- Logo e Descrição -->
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <div class="footer-brand">
+                        <i class="bi bi-text-paragraph footer-logo"></i>
+                        <h5 class="mt-2">OCR Brazcubas</h5>
+                        <p class="mt-3">Transformando imagens em texto estruturado de forma inteligente e eficiente. Solução ideal para empresas, educadores e pessoas físicas.</p>
+                    </div>
+                </div>
+
+                <!-- Links Rápidos -->
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="footer-title">Links Rápidos</h5>
+                    <ul class="footer-links">
+                        <li><a href="#features">Recursos</a></li>
+                        <li><a href="#how-it-works">Como Funciona</a></li>
+                        <li><a href="/ocr">Começar</a></li>
+                        <li><a href="#cases">Casos de Uso</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contato -->
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="footer-title">Contato</h5>
+                    <ul class="footer-contact">
+                        <li>
+                            <i class="bi bi-envelope"></i>
+                            <span>contato@ocrbrazcubas.com</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-geo-alt"></i>
+                            <span>São Paulo, SP</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-telephone"></i>
+                            <span>(11) 1234-5678</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Redes Sociais -->
+                <div class="col-lg-3">
+                    <h5 class="footer-title">Redes Sociais</h5>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <i class="bi bi-github"></i>
+                            <span>GitHub</span>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="bi bi-linkedin"></i>
+                            <span>LinkedIn</span>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="bi bi-twitter"></i>
+                            <span>Twitter</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="footer-bottom">
+                <hr class="footer-divider">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="mb-0">&copy; 2024 OCR Brazcubas. Todos os direitos reservados.</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <a href="#" class="footer-bottom-link">Termos de Uso</a>
+                        <a href="#" class="footer-bottom-link">Política de Privacidade</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR - Extração de Texto</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/logo.svg') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ocr.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('landing') }}">
+                <i class="bi bi-text-paragraph"></i>
+                OCR Brazcubas
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('landing') }}#features">Recursos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('landing') }}#how-it-works">Como Funciona</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('ocr') }}">Começar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5 pt-5">
+        <h1 class="text-center mb-5">Extração de Texto</h1>
+        
+        <div class="upload-area p-5 text-center mb-4">
+            <i class="bi bi-cloud-upload display-1 mb-3"></i>
+            <h2 class="mb-4">Arraste e Solte sua Imagem</h2>
+            <p class="text-muted mb-4">ou</p>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="imageInput" class="d-none" accept="image/*,.pdf,.tiff,.bmp,.webp">
+                <button type="button" class="btn btn-primary btn-lg mb-3" onclick="document.getElementById('imageInput').click()">
+                    <i class="bi bi-folder2-open"></i> Selecionar Arquivo
+                </button>
+                <p class="text-muted">Formatos suportados: JPG, PNG, PDF, TIFF, BMP, WEBP</p>
+                <p class="text-muted small">Tamanho máximo: 10MB</p>
+            </form>
+        </div>
+
+        <div id="previewArea" class="d-none">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Prévia da Imagem</h5>
+                    <div class="skeleton-container" id="previewSkeleton">
+                        <div class="skeleton skeleton-image mb-3"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                    <img id="imagePreview" class="img-fluid rounded" alt="Prévia da imagem">
+                </div>
+            </div>
+            <div class="text-center mb-4">
+                <button id="processButton" class="btn btn-primary btn-lg">
+                    <i class="bi bi-gear"></i> Processar Imagem
+                </button>
+                <button id="resetButton" class="btn btn-secondary btn-lg ms-2">
+                    <i class="bi bi-x-circle"></i> Limpar
+                </button>
+            </div>
+        </div>
+
+        <div id="resultArea" class="d-none">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Texto Extraído</h5>
+                    <div class="skeleton-container" id="textSkeleton">
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                    <div id="extractedText" class="border rounded p-3 bg-light"></div>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="btn-group" role="group">
+                    <button id="downloadTxt" class="btn btn-success">
+                        <i class="bi bi-file-text"></i> TXT
+                    </button>
+                    <button id="downloadCsv" class="btn btn-info">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> CSV
+                    </button>
+                    <button id="downloadJson" class="btn btn-warning">
+                        <i class="bi bi-file-code"></i> JSON
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <!-- Logo e Descrição -->
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <div class="footer-brand">
+                        <i class="bi bi-text-paragraph footer-logo"></i>
+                        <h5 class="mt-2">OCR Brazcubas</h5>
+                        <p class="mt-3">Transformando imagens em texto estruturado de forma inteligente e eficiente. Solução ideal para empresas, educadores e pessoas físicas.</p>
+                    </div>
+                </div>
+
+                <!-- Links Rápidos -->
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="footer-title">Links Rápidos</h5>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('landing') }}#features">Recursos</a></li>
+                        <li><a href="{{ url_for('landing') }}#how-it-works">Como Funciona</a></li>
+                        <li><a href="{{ url_for('ocr') }}">Começar</a></li>
+                        <li><a href="{{ url_for('landing') }}#cases">Casos de Uso</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contato -->
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="footer-title">Contato</h5>
+                    <ul class="footer-contact">
+                        <li>
+                            <i class="bi bi-envelope"></i>
+                            <span>contato@ocrbrazcubas.com</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-geo-alt"></i>
+                            <span>São Paulo, SP</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-telephone"></i>
+                            <span>(11) 1234-5678</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Redes Sociais -->
+                <div class="col-lg-3">
+                    <h5 class="footer-title">Redes Sociais</h5>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <i class="bi bi-github"></i>
+                            <span>GitHub</span>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="bi bi-linkedin"></i>
+                            <span>LinkedIn</span>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="bi bi-twitter"></i>
+                            <span>Twitter</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="footer-bottom">
+                <hr class="footer-divider">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="mb-0">&copy; 2024 OCR Brazcubas. Todos os direitos reservados.</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <a href="#" class="footer-bottom-link">Termos de Uso</a>
+                        <a href="#" class="footer-bottom-link">Política de Privacidade</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- VLibras -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script> new window.VLibras.Widget('https://vlibras.gov.br/app'); </script>
+    <script src="{{ url_for('static', filename='js/ocr.js') }}"></script>
+</body>
+</html> 

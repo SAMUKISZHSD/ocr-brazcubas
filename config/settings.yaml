@@ -1,0 +1,9 @@
+# config/settings.yaml
+paths:
+  input_dir: "./data/input/"
+  processed_dir: "./data/output/processed/"
+  text_dir: "./data/output/text/"
+
+ocr:
+  language: "por"  # Idioma para o OCR (português)
+  threshold: 150   # Valor de limiarização para pré-processamento
