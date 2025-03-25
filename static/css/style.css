@@ -436,6 +436,16 @@ body {
         padding: 50px 0;
     }
 
+    .hero-content{
+        margin-top: 50px;
+
+    }
+
+    .hero-content a{
+        margin-bottom: 25px;
+
+    }
+
     .feature-card {
         margin-bottom: 20px;
     }
@@ -473,6 +483,15 @@ body {
         width: 45px;
         height: 45px;
     }
+}
+
+@media (max-width: 990px) {
+
+    .hero-content a{
+        margin-bottom: 25px;
+
+    }
+
 }
 
 /* Skeleton Loading */
