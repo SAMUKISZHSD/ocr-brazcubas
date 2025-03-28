@@ -5,3 +5,7 @@ numpy==1.21.2
 easyocr==1.4.1
 scikit-image==0.22.0
 Pillow==8.3.2
+transformers
+torch
+sentencepiece
+protobuf==3.20.0

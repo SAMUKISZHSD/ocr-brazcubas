@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadTxt = document.getElementById('downloadTxt');
     const downloadCsv = document.getElementById('downloadCsv');
     const downloadJson = document.getElementById('downloadJson');
+    const metricsArea = document.getElementById('metricsArea');
 
     let currentFile = null;
     let currentText = '';
@@ -107,43 +108,9 @@ document.addEventListener('DOMContentLoaded', function() {
         imagePreview.src = '';
         previewArea.classList.add('d-none');
         resultArea.classList.add('d-none');
+        metricsArea.classList.add('d-none');
         extractedText.textContent = '';
     });
-
-    // Atualizar a função processImage
-    async function processImage() {
-        const fileInput = document.getElementById('fileInput');
-        const file = fileInput.files[0];
-        
-        if (!file) {
-            alert('Por favor, selecione uma imagem primeiro.');
-            return;
-        }
-
-        showSkeleton('textSkeleton');
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            const response = await fetch('/process', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error('Erro ao processar a imagem');
-            }
-
-            const data = await response.json();
-            document.getElementById('extractedText').textContent = data.text;
-            document.getElementById('resultArea').style.display = 'block';
-        } catch (error) {
-            console.error('Erro:', error);
-            alert('Erro ao processar a imagem. Por favor, tente novamente.');
-        } finally {
-            hideSkeleton('textSkeleton');
-        }
-    }
 
     function uploadFile(file) {
         const formData = new FormData();
@@ -166,6 +133,37 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 currentText = data.text;
                 extractedText.textContent = data.text;
+                
+                // Exibir métricas de qualidade
+                if (data.quality_metrics) {
+                    const metricsHtml = `
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Métricas de Qualidade</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Método Utilizado:</strong> ${data.quality_metrics.best_method}</p>
+                                        <p><strong>Pontuação Total:</strong> ${data.quality_metrics.best_method_score.toFixed(2)}</p>
+                                        <p><strong>Pontuação do Texto:</strong> ${data.quality_metrics.best_method_text_score.toFixed(2)}</p>
+                                        <p><strong>Pontuação da Imagem:</strong> ${data.quality_metrics.best_method_image_score.toFixed(2)}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Validação:</strong> ${data.quality_metrics.validation_message}</p>
+                                        <p><strong>Sugestões:</strong></p>
+                                        <ul>
+                                            ${data.quality_metrics.suggestions.map(s => `<li>${s}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    metricsArea.innerHTML = metricsHtml;
+                    metricsArea.classList.remove('d-none');
+                }
+                
                 resultArea.classList.remove('d-none');
             }
         })
@@ -189,40 +187,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function downloadText(format) {
-        let content = '';
-        let mimeType = '';
-        let filename = `ocr_result_${new Date().toISOString().slice(0,19).replace(/[:]/g, '')}`;
-
-        switch(format) {
-            case 'txt':
-                content = currentText;
-                mimeType = 'text/plain';
-                filename += '.txt';
-                break;
-            case 'csv':
-                content = `Texto\n"${currentText.replace(/"/g, '""')}"`;
-                mimeType = 'text/csv';
-                filename += '.csv';
-                break;
-            case 'json':
-                content = JSON.stringify({
-                    text: currentText,
-                    timestamp: new Date().toISOString(),
-                    filename: currentFile ? currentFile.name : 'unknown'
-                }, null, 2);
-                mimeType = 'application/json';
-                filename += '.json';
-                break;
+        if (!currentText) {
+            alert('Nenhum texto para baixar');
+            return;
         }
 
-        const blob = new Blob([content], { type: mimeType });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        const formData = new FormData();
+        formData.append('text', currentText);
+
+        fetch(`/download/${format}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `texto_extraido.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+        })
+        .catch(error => {
+            alert('Erro ao baixar o arquivo: ' + error);
+        });
     }
 }); 
