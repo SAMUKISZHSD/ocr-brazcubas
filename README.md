@@ -63,7 +63,7 @@ O sistema utiliza duas engines de OCR em paralelo para maior precisão:
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/ocr-brazcubas.git
+git clone https://github.com/SAMUKISZHSD/ocr-brazcubas.git
 cd ocr-brazcubas
 ```
 
