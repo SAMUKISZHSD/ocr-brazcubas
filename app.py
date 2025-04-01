@@ -10,6 +10,8 @@ from datetime import datetime
 import pytesseract
 import re
 from transformers import pipeline
+from scripts.plate_ocr import process_plate
+from scripts.receipt_ocr import process_receipt
 
 # Configurar o caminho do Tesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\josea\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
@@ -767,44 +769,31 @@ def process_license_plate(image):
 
 @app.route('/analyze-plate', methods=['POST'])
 def analyze_plate():
-    """Endpoint para análise de placas de carro"""
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'Nenhum arquivo enviado'})
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'success': False, 'error': 'Nenhum arquivo selecionado'})
+    
     try:
-        if 'file' not in request.files:
-            return jsonify({'error': 'Nenhum arquivo enviado'}), 400
-            
-        file = request.files['file']
-        if file.filename == '':
-            return jsonify({'error': 'Nenhum arquivo selecionado'}), 400
-            
         # Ler a imagem
-        in_memory_file = io.BytesIO()
-        file.save(in_memory_file)
-        data = np.frombuffer(in_memory_file.getvalue(), dtype=np.uint8)
-        image = cv2.imdecode(data, cv2.IMREAD_COLOR)
+        file_bytes = file.read()
+        nparr = np.frombuffer(file_bytes, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         if image is None:
-            return jsonify({'error': 'Erro ao processar imagem'}), 400
-            
-        # Processar a placa
-        plate_text, confidence = process_license_plate(image)
+            return jsonify({'success': False, 'error': 'Erro ao processar a imagem'})
         
-        if plate_text:
-            return jsonify({
-                'success': True,
-                'plate': plate_text,
-                'confidence': float(confidence)
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'error': 'Não foi possível identificar uma placa válida na imagem'
-            })
-            
+        # Processar a placa usando a função específica para placas
+        result = process_plate(image)
+        return jsonify(result)
+        
     except Exception as e:
         return jsonify({
             'success': False,
             'error': f'Erro ao processar imagem: {str(e)}'
-        }), 500
+        })
 
 @app.route('/')
 def landing():
@@ -1163,6 +1152,38 @@ def test():
 @app.route('/plate')
 def plate():
     return render_template('plate.html')
+
+@app.route('/receipt')
+def receipt():
+    return render_template('receipt.html')
+
+@app.route('/analyze-receipt', methods=['POST'])
+def analyze_receipt():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'Nenhum arquivo enviado'})
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'success': False, 'error': 'Nenhum arquivo selecionado'})
+    
+    try:
+        # Ler a imagem
+        file_bytes = file.read()
+        nparr = np.frombuffer(file_bytes, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        if image is None:
+            return jsonify({'success': False, 'error': 'Erro ao processar a imagem'})
+        
+        # Processar o cupom fiscal
+        result = process_receipt(image)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Erro ao processar imagem: {str(e)}'
+        })
 
 if __name__ == '__main__':
     app.run(debug=True)
