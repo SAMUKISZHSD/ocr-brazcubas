@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Cupom Fiscal - OCR Brazcubas</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/logo.svg') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ocr.css') }}">
+    <style>
+        .upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        .upload-area:hover {
+            border-color: #0d6efd;
+        }
+        .receipt-result {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .receipt-field {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            background: white;
+        }
+        .receipt-field label {
+            font-weight: bold;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+        .receipt-field .value {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.1rem;
+        }
+        .processing-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .processing-content {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .receipt-preview {
+            max-height: 400px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+        .products-table {
+            margin-top: 1rem;
+        }
+        .products-table th {
+            background: #f1f3f5;
+        }
+        .confidence-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .confidence-high { background-color: #28a745; }
+        .confidence-medium { background-color: #ffc107; }
+        .confidence-low { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('landing') }}">
+                <i class="bi bi-text-paragraph"></i>
+                OCR Brazcubas
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('landing') }}#features">Recursos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('landing') }}#how-it-works">Como Funciona</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('ocr') }}">OCR Geral</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('receipt') }}">Cupom Fiscal</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Processing Overlay -->
+    <div class="processing-overlay">
+        <div class="processing-content">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <h4>Processando Cupom Fiscal</h4>
+            <p class="text-muted mb-0">Extraindo informações do documento...</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-5 pt-5">
+        <h1 class="text-center mb-5">Extração de Cupom Fiscal</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="upload-area">
+                    <i class="bi bi-receipt display-1 mb-3"></i>
+                    <h3>Envie a foto do cupom fiscal</h3>
+                    <p class="text-muted">Arraste e solte ou clique para selecionar</p>
+                    <input type="file" id="receiptInput" class="d-none" accept="image/*">
+                    <button class="btn btn-primary btn-lg" onclick="document.getElementById('receiptInput').click()">
+                        <i class="bi bi-upload"></i> Selecionar Imagem
+                    </button>
+                </div>
+
+                <div id="previewArea" class="d-none">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Prévia do Cupom</h5>
+                            <img id="receiptPreview" class="img-fluid receipt-preview rounded" alt="Prévia do cupom">
+                            <div class="text-center mt-3">
+                                <button id="analyzeReceipt" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-search"></i> Analisar Cupom
+                                </button>
+                                <button id="resetReceipt" class="btn btn-secondary btn-lg ms-2">
+                                    <i class="bi bi-x-circle"></i> Limpar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="resultArea" class="d-none receipt-result">
+                    <h4 class="mb-4">Informações Extraídas</h4>
+                    
+                    <!-- Cabeçalho -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="receipt-field">
+                                <label>CNPJ da Empresa</label>
+                                <div class="value" id="cnpjValue">-</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="receipt-field">
+                                <label>Número do Extrato</label>
+                                <div class="value" id="extractNumber">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações do SAT -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="receipt-field">
+                                <label>Número SAT</label>
+                                <div class="value" id="satNumber">-</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="receipt-field">
+                                <label>Data e Hora</label>
+                                <div class="value" id="dateTime">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Produtos -->
+                    <div class="receipt-field mt-4">
+                        <label>Produtos/Serviços</label>
+                        <div class="table-responsive">
+                            <table class="table table-striped products-table">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Descrição</th>
+                                        <th>Qtde</th>
+                                        <th>UN</th>
+                                        <th>Vl Unit</th>
+                                        <th>Vl Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTable">
+                                    <!-- Preenchido via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Totais -->
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="receipt-field">
+                                <label>Valor Total</label>
+                                <div class="value" id="totalValue">-</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="receipt-field">
+                                <label>Forma de Pagamento</label>
+                                <div class="value" id="paymentMethod">-</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="receipt-field">
+                                <label>Tributos Totais</label>
+                                <div class="value" id="totalTaxes">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="text-center mt-4">
+                        <button class="btn btn-success btn-lg" id="downloadBtn">
+                            <i class="bi bi-download"></i> Baixar Dados
+                        </button>
+                        <button class="btn btn-outline-primary btn-lg ms-2" id="copyBtn">
+                            <i class="bi bi-clipboard"></i> Copiar Dados
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const receiptInput = document.getElementById('receiptInput');
+            const receiptPreview = document.getElementById('receiptPreview');
+            const previewArea = document.getElementById('previewArea');
+            const resultArea = document.getElementById('resultArea');
+            const analyzeReceipt = document.getElementById('analyzeReceipt');
+            const resetReceipt = document.getElementById('resetReceipt');
+            const processingOverlay = document.querySelector('.processing-overlay');
+
+            receiptInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        receiptPreview.src = e.target.result;
+                        previewArea.classList.remove('d-none');
+                        resultArea.classList.add('d-none');
+                    }
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+
+            analyzeReceipt.addEventListener('click', function() {
+                // Desabilitar botões e mostrar overlay
+                analyzeReceipt.disabled = true;
+                resetReceipt.disabled = true;
+                processingOverlay.style.display = 'flex';
+
+                const formData = new FormData();
+                formData.append('file', receiptInput.files[0]);
+
+                fetch('/analyze-receipt', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Esconder overlay
+                    processingOverlay.style.display = 'none';
+                    
+                    // Reabilitar botões
+                    analyzeReceipt.disabled = false;
+                    resetReceipt.disabled = false;
+
+                    if (data.success) {
+                        // Preencher os campos com os dados extraídos
+                        document.getElementById('cnpjValue').textContent = data.cnpj || '-';
+                        document.getElementById('extractNumber').textContent = data.extractNumber || '-';
+                        document.getElementById('satNumber').textContent = data.satNumber || '-';
+                        document.getElementById('dateTime').textContent = data.dateTime || '-';
+                        document.getElementById('totalValue').textContent = data.totalValue || '-';
+                        document.getElementById('paymentMethod').textContent = data.paymentMethod || '-';
+                        document.getElementById('totalTaxes').textContent = data.totalTaxes || '-';
+
+                        // Preencher tabela de produtos
+                        const productsTable = document.getElementById('productsTable');
+                        productsTable.innerHTML = '';
+                        
+                        if (data.products && data.products.length > 0) {
+                            data.products.forEach(product => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${product.code}</td>
+                                    <td>${product.description}</td>
+                                    <td>${product.quantity}</td>
+                                    <td>${product.unit}</td>
+                                    <td>${product.unitValue}</td>
+                                    <td>${product.totalValue}</td>
+                                `;
+                                productsTable.appendChild(row);
+                            });
+                        } else {
+                            productsTable.innerHTML = '<tr><td colspan="6" class="text-center">Nenhum produto encontrado</td></tr>';
+                        }
+
+                        resultArea.classList.remove('d-none');
+                    } else {
+                        alert(data.error || 'Erro ao processar o cupom fiscal');
+                    }
+                })
+                .catch(error => {
+                    // Esconder overlay
+                    processingOverlay.style.display = 'none';
+                    
+                    // Reabilitar botões
+                    analyzeReceipt.disabled = false;
+                    resetReceipt.disabled = false;
+                    
+                    console.error('Error:', error);
+                    alert('Erro ao processar a imagem');
+                });
+            });
+
+            resetReceipt.addEventListener('click', function() {
+                receiptInput.value = '';
+                previewArea.classList.add('d-none');
+                resultArea.classList.add('d-none');
+            });
+
+            // Drag and drop support
+            const uploadArea = document.querySelector('.upload-area');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                uploadArea.classList.add('border-primary');
+            }
+
+            function unhighlight(e) {
+                uploadArea.classList.remove('border-primary');
+            }
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files && files[0]) {
+                    receiptInput.files = files;
+                    const event = new Event('change');
+                    receiptInput.dispatchEvent(event);
+                }
+            }
+
+            // Botões de ação
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                // Implementar download dos dados em CSV ou PDF
+                alert('Função de download em desenvolvimento');
+            });
+
+            document.getElementById('copyBtn').addEventListener('click', function() {
+                // Implementar cópia dos dados para a área de transferência
+                alert('Função de cópia em desenvolvimento');
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
