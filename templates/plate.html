@@ -41,6 +41,37 @@
             background-color: #28a745;
             transition: width 0.3s ease;
         }
+        .loading-spinner {
+            display: none;
+            width: 3rem;
+            height: 3rem;
+            margin: 1rem auto;
+        }
+        .loading-text {
+            display: none;
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .processing-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .processing-content {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -72,6 +103,17 @@
             </div>
         </div>
     </nav>
+
+    <!-- Processing Overlay -->
+    <div class="processing-overlay">
+        <div class="processing-content">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <h4>Processando imagem...</h4>
+            <p class="text-muted">Isso pode levar alguns segundos</p>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <div class="container mt-5 pt-5">
@@ -132,6 +174,7 @@
             const confidenceLevel = document.getElementById('confidenceLevel');
             const analyzePlate = document.getElementById('analyzePlate');
             const resetPlate = document.getElementById('resetPlate');
+            const processingOverlay = document.querySelector('.processing-overlay');
 
             plateInput.addEventListener('change', function(e) {
                 if (e.target.files && e.target.files[0]) {
@@ -146,6 +189,13 @@
             });
 
             analyzePlate.addEventListener('click', function() {
+                // Desabilitar botões durante o processamento
+                analyzePlate.disabled = true;
+                resetPlate.disabled = true;
+                
+                // Mostrar overlay de processamento
+                processingOverlay.style.display = 'flex';
+                
                 const formData = new FormData();
                 formData.append('file', plateInput.files[0]);
 
@@ -155,6 +205,13 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    // Esconder overlay de processamento
+                    processingOverlay.style.display = 'none';
+                    
+                    // Reabilitar botões
+                    analyzePlate.disabled = false;
+                    resetPlate.disabled = false;
+                    
                     if (data.success) {
                         plateText.textContent = data.plate;
                         confidenceLevel.style.width = `${data.confidence * 100}%`;
@@ -164,6 +221,13 @@
                     }
                 })
                 .catch(error => {
+                    // Esconder overlay de processamento
+                    processingOverlay.style.display = 'none';
+                    
+                    // Reabilitar botões
+                    analyzePlate.disabled = false;
+                    resetPlate.disabled = false;
+                    
                     console.error('Error:', error);
                     alert('Erro ao processar a imagem');
                 });
