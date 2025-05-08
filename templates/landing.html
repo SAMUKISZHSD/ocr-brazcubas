@@ -82,10 +82,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="video-container rounded shadow">
-                        <video autoplay loop muted playsinline class="img-fluid rounded">
-                            <source src="{{ url_for('static', filename='videos/demo.mp4') }}" type="video/mp4">
+                 <div class="col-lg-6">
+                     <div class="video-container rounded shadow">
+                     <video autoplay loop muted playsinline class="img-fluid rounded">
+                            <source src="{{ url_for('static', filename='videos/Análise de Placas - OCR Brazcubas e mais 4 páginas - Pessoal — Microsoft​ Edge 2025-05-08 19-44-16.mp4') }}" type="video/mp4">
                             Seu navegador não suporta o elemento de vídeo.
                         </video>
                     </div>
@@ -240,7 +240,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <div class="receipt-demo rounded shadow overflow-hidden">
-                        <img src="{{ url_for('static', filename='img/receipt-demo.jpg') }}" alt="Demo OCR Cupom Fiscal" class="img-fluid">
+                        <img src="{{ url_for('static', filename='img/ft_cp.jpeg') }}" alt="Demo OCR Cupom Fiscal" class="img-fluid">
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -303,7 +303,7 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="plate-demo rounded shadow overflow-hidden">
-                        <img src="{{ url_for('static', filename='img/plate-demo.jpg') }}" alt="Demo OCR Placas" class="img-fluid">
+                        <img src="{{ url_for('static', filename='img/plate-demo.png') }}" alt="Demo OCR Placas" class="img-fluid">
                     </div>
                 </div>
             </div>
@@ -416,26 +416,84 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="py-4 bg-dark text-light">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>OCR Brazcubas</h5>
-                    <p>Transformando imagens em texto com precisão e eficiência.</p>
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
+                    <!-- Logo e Descrição -->
+                    <div class="col-lg-4 mb-4 mb-lg-0">
+                        <div class="footer-brand">
+                            <i class="bi bi-text-paragraph footer-logo"></i>
+                            <h5 class="mt-2">OCR Brazcubas</h5>
+                            <p class="mt-3">Transformando imagens em texto estruturado de forma inteligente e eficiente. Solução ideal para empresas, educadores e pessoas físicas.</p>
+                        </div>
+                    </div>
+    
+                    <!-- Links Rápidos -->
+                    <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                        <h5 class="footer-title">Links Rápidos</h5>
+                        <ul class="footer-links">
+                            <li><a href="{{ url_for('landing') }}#features">Recursos</a></li>
+                            <li><a href="{{ url_for('landing') }}#how-it-works">Como Funciona</a></li>
+                            <li><a href="{{ url_for('ocr') }}">Começar</a></li>
+                            <li><a href="{{ url_for('landing') }}#cases">Casos de Uso</a></li>
+                        </ul>
+                    </div>
+    
+                    <!-- Contato -->
+                    <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                        <h5 class="footer-title">Contato</h5>
+                        <ul class="footer-contact">
+                            <li>
+                                <i class="bi bi-envelope"></i>
+                                <span>contato@ocrbrazcubas.com</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-geo-alt"></i>
+                                <span>São Paulo, SP</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-telephone"></i>
+                                <span>(11) 1234-5678</span>
+                            </li>
+                        </ul>
+                    </div>
+    
+                    <!-- Redes Sociais -->
+                    <div class="col-lg-3">
+                        <h5 class="footer-title">Redes Sociais</h5>
+                        <div class="social-links">
+                            <a href="#" class="social-link">
+                                <i class="bi bi-github"></i>
+                                <span>GitHub</span>
+                            </a>
+                            <a href="#" class="social-link">
+                                <i class="bi bi-linkedin"></i>
+                                <span>LinkedIn</span>
+                            </a>
+                            <a href="#" class="social-link">
+                                <i class="bi bi-twitter"></i>
+                                <span>Twitter</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <h5>Links Rápidos</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/ocr" class="text-light">OCR Geral</a></li>
-                        <li><a href="/plate" class="text-light">OCR Placas</a></li>
-                        <li><a href="#features" class="text-light">Recursos</a></li>
-                        <li><a href="#how-it-works" class="text-light">Como Funciona</a></li>
-                    </ul>
+    
+                <!-- Copyright -->
+                <div class="footer-bottom">
+                    <hr class="footer-divider">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 text-center text-md-start">
+                            <p class="mb-0">&copy; 2024 OCR Brazcubas. Todos os direitos reservados.</p>
+                        </div>
+                        <div class="col-md-6 text-center text-md-end">
+                            <a href="#" class="footer-bottom-link">Termos de Uso</a>
+                            <a href="#" class="footer-bottom-link">Política de Privacidade</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </footer>
+        </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
